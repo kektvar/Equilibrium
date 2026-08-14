@@ -1,0 +1,6 @@
+Equilibrium
+.clangd
+*.o 
+*.log 
+.vscode/
+compile_commands.json
