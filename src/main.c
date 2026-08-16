@@ -1,7 +1,9 @@
 #include "shell.h"
+#include "parser.h"
 
 void shells_loop() {
   char *line = NULL; // указатель под строку ввода
+  char **args = NULL; // адрес массива указателей на полученные токены
   
   //fprintf(stderr, "[DEBUG] shell_loop started\n");
 
@@ -19,11 +21,24 @@ void shells_loop() {
       break;
     }
 
-    printf("Input: %s", line);
+    args = shell_split_line(line);
+
+    if (args[0] == NULL) {
+      free(args);
+      free(line);
+      continue; // пропускаем итерацию и снова выводим промпт
+    }
+
+    for (int i = 0; args[i] != NULL; i++) { // поскольку мы не передаём явную длину массива,
+      // цикл опирается на sentinel-значение (NULL в последней ячейке args), которое записал парсер
+      printf(" arg[%d]: %s\n", i, args[i]);
+    }
+
+    free(args); // освобождает память, выделенную под массив указателей в shell_split_line() через malloc()
     free(line); // освобождение памяти после функции getline внутри shells_readline
     // сли забыть эту строку, при каждом нажатии Enter будет утекать по несколько десятков байт оперативной памяти
     
-    line = NULL; // обнуляем указатель после очистки
+    // line = NULL; // обнуляем указатель после очистки
   }
 }
 
