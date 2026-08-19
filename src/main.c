@@ -1,13 +1,14 @@
 #include "shell.h"
 #include "parser.h"
+#include "executor.h"
 
 void shells_loop() {
   char *line = NULL; // указатель под строку ввода
   char **args = NULL; // адрес массива указателей на полученные токены
+  int status = 1;
   
   //fprintf(stderr, "[DEBUG] shell_loop started\n");
-
-  while (1) { // while true 
+  do {
     printf("?> "); //TODO: сделать логин пользователя вместо ?
 
     fflush(stdout); // в линукс поток вывода stdout по умолчанию буферизуется строками (Line-buffered)
@@ -22,16 +23,9 @@ void shells_loop() {
     }
 
     args = shell_split_line(line);
-
-    if (args[0] == NULL) {
-      free(args);
-      free(line);
-      continue; // пропускаем итерацию и снова выводим промпт
-    }
-
-    for (int i = 0; args[i] != NULL; i++) { // поскольку мы не передаём явную длину массива,
-      // цикл опирается на sentinel-значение (NULL в последней ячейке args), которое записал парсер
-      printf(" arg[%d]: %s\n", i, args[i]);
+    if (args[0] != NULL) { // фильтр пустого ввода
+      status = shell_execute(args); // забирает распарсенный массив аргументов, создает дочерний процесс и запускает бинарник через
+      // execvp, возвращенный результат сохраняется в статус
     }
 
     free(args); // освобождает память, выделенную под массив указателей в shell_split_line() через malloc()
@@ -39,7 +33,7 @@ void shells_loop() {
     // сли забыть эту строку, при каждом нажатии Enter будет утекать по несколько десятков байт оперативной памяти
     
     // line = NULL; // обнуляем указатель после очистки
-  }
+  } while (status);
 }
 
 int main() {
