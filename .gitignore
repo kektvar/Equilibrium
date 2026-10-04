@@ -4,3 +4,7 @@ Equilibrium
 *.log 
 .vscode/
 compile_commands.json
+<<<<<<< HEAD
+=======
+.cache/
+>>>>>>> 636364c (added README)
